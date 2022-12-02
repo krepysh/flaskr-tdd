@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flaskr|index</title>
+</head>
+<body>
+<nav class="navigation">
+    <a href="/login">Login</a>|
+    <a href="/logout">Logout</a>|
+    <a href="/add_entry">Add entry</a>
+</nav>
+{% with messages = get_flashed_messages() %}
+    {% for message in messages %}
+        <div class="flash">{{ message }}</div>
+    {% endfor %}
+{% endwith %}
+{% if session.logged_in %}
+    <form method="post" action="/add_entry">
+    <label for="title">Title</label>
+    <input type="text" name="title" id="title">
+    <label for="body">Body</label>
+    <input type="text" name="body" id="body">
+    <input type="submit">
+    </form>
+{% endif %}
+{% for entry in entries %}
+    <div class="entry_wrapper">
+        <h5>{{ entry.title }}</h5>
+        <p>{{ entry.body }}</p>
+    </div>
+{% else %}
+<p>No messages, yet. Add one.</p>
+{% endfor %}
+</body>
+</html>

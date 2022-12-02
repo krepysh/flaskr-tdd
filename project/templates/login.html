@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Flaskr|index</title>
+</head>
+<body>
+<nav class="navigation">
+    <a href="/login">Login</a>
+    <a href="/logout">Logout</a>
+    <a href="/add_entry">Add entry</a>
+</nav>
+{% with messages = get_flashed_messages() %}
+    {% for message in messages %}
+        <div class="flash">{{ message }}</div>
+    {% endfor %}
+{% endwith %}
+<form method="post" action="/login">
+    <label for="username">User name</label>
+    <input type="text" name="username" id="username">
+    <label for="password">Password</label>
+    <input type="password" name="password" id="password">
+    <input type="submit">
+</form>
+
+</body>
+</html>
