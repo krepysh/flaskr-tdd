@@ -24,13 +24,19 @@
     <input type="submit">
     </form>
 {% endif %}
+<ul>
 {% for entry in entries %}
-    <div class="entry_wrapper">
-        <h5>{{ entry.title }}</h5>
+    <li class="entry" id="{{ entry.id }}">
+        <h2 id="{{ entry.id }}">{{ entry.title }}</h2>
         <p>{{ entry.body }}</p>
-    </div>
+    </li>
 {% else %}
 <p>No messages, yet. Add one.</p>
 {% endfor %}
+</ul>
 </body>
+<script
+        type="application/javascript"
+        src="{{ url_for('static', filename='main.js') }}"
+></script>
 </html>

@@ -13,6 +13,7 @@ from flask import (
     redirect,
     url_for,
     abort,
+    jsonify,
 )
 
 DATABASE = "flaskr.sqlite3"
@@ -83,14 +84,17 @@ def add_entry():
     return redirect(url_for("index"))
 
 
-@app.route("/message/<message_id>/delete", methods=["POST"])
+@app.route("/delete/<message_id>", methods=["GET", "POST"])
 def delete_message(message_id):
-    db = get_db()
-    query = "DELETE from entries where id = ?"
-    result = db.execute(query, message_id)
-    db.commit()
-    if result.rowcount == 1:
-        return redirect(url_for("index"))
+    try:
+        db = get_db()
+        query = "DELETE from entries where id = ?"
+        db.execute(query, message_id)
+        db.commit()
+        result = {"result": 1, "message": "Post deleted"}
+    except Exception as e:
+        result = {"result": 0, "message": str(e)}
+    return jsonify(result)
 
 
 def connect_db() -> Connection:

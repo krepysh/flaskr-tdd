@@ -67,7 +67,6 @@ def test_add_entry(logged_in_client):
 
 def test_delete_message(logged_in_client):
     test_add_entry(logged_in_client)
-    response = logged_in_client.post("/message/1/delete", follow_redirects=True)
+    response = logged_in_client.post("/delete/1", follow_redirects=True)
 
-    assert response.status_code == 200
-    assert b"No messages, yet. Add one." in response.data
+    assert response.json == {"result": 1, "message": "Post deleted"}
