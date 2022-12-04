@@ -2,26 +2,43 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Flaskr|index</title>
+    <title>Flaskr | index</title>
+     <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0-beta1/dist/css/bootstrap.min.css"
+    />
 </head>
 <body>
+<div class="container">
 <nav class="navigation">
     <a href="/login">Login</a>|
     <a href="/logout">Logout</a>|
     <a href="/add_entry">Add entry</a>
 </nav>
+{% if not session.logged_in %}
+    <a class="btn btn-success" role="button" href="{{ url_for('login') }}">Login</a>
+{% else %}
+    <a class="btn btn-warning" role="button" href="{{ url_for('logout') }}">Logout</a>
+{% endif %}
+<h1>Flaskr</h1>
 {% with messages = get_flashed_messages() %}
     {% for message in messages %}
-        <div class="flash">{{ message }}</div>
+        <div class="flash alert alert-success col-sm-4">{{ message }}</div>
     {% endfor %}
 {% endwith %}
 {% if session.logged_in %}
-    <form method="post" action="/add_entry">
+    <form method="post" action="/add_entry" class="form-group">
     <label for="title">Title</label>
-    <input type="text" name="title" id="title">
+    <input type="text" name="title" id="title" size="30" class="form-control col-sm-4">
     <label for="body">Body</label>
-    <input type="text" name="body" id="body">
-    <input type="submit">
+    <textarea
+              name="body"
+              rows="5"
+              cols="40"
+              class="form-control col-sm-4"
+            ></textarea>
+    <input class="btn btn-primary" type="submit" value="Share">
     </form>
 {% endif %}
 <ul>
@@ -31,9 +48,10 @@
         <p>{{ entry.body }}</p>
     </li>
 {% else %}
-<p>No messages, yet. Add one.</p>
+    <li><em>No messages, yet. Add one.</em></li>
 {% endfor %}
 </ul>
+</div>
 </body>
 <script
         type="application/javascript"
