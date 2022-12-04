@@ -63,3 +63,11 @@ def test_add_entry(logged_in_client):
     assert response.status_code == 200
     assert b"ttitle" in response.data
     assert b"tbody" in response.data
+
+
+def test_delete_message(logged_in_client):
+    test_add_entry(logged_in_client)
+    response = logged_in_client.post("/message/1/delete", follow_redirects=True)
+
+    assert response.status_code == 200
+    assert b"No messages, yet. Add one." in response.data

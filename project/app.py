@@ -3,7 +3,17 @@ import sqlite3
 from sqlite3 import Connection
 from typing import NamedTuple
 
-from flask import Flask, g, render_template, session, request, flash, redirect, url_for, abort
+from flask import (
+    Flask,
+    g,
+    render_template,
+    session,
+    request,
+    flash,
+    redirect,
+    url_for,
+    abort,
+)
 
 DATABASE = "flaskr.sqlite3"
 USER_NAME = "admin"
@@ -62,7 +72,7 @@ def extract_entry(form: dict) -> Entry:
 
 @app.route("/add_entry", methods=["POST"])
 def add_entry():
-    if not session.get('logged_in'):
+    if not session.get("logged_in"):
         abort(401)
     entry = extract_entry(request.form)
     db = get_db()
@@ -71,6 +81,16 @@ def add_entry():
     db.commit()
     flash(f"Inserted {cur.rowcount} rows.")
     return redirect(url_for("index"))
+
+
+@app.route("/message/<message_id>/delete", methods=["POST"])
+def delete_message(message_id):
+    db = get_db()
+    query = "DELETE from entries where id = ?"
+    result = db.execute(query, message_id)
+    db.commit()
+    if result.rowcount == 1:
+        return redirect(url_for("index"))
 
 
 def connect_db() -> Connection:
