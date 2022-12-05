@@ -48,7 +48,7 @@ def test_login_logout(client):
 
 def test_db():
     init_db()
-    assert Path("tests/test_db.sqlite3").is_file()
+    assert Path("test_db.sqlite3").is_file()
 
 
 def test_empty_db(client):
