@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flaskr|index</title>
     <link
       rel="stylesheet"
@@ -17,7 +18,7 @@
         <div class="flash alert alert-success col-sm-4">{{ message }}</div>
     {% endfor %}
 {% endwith %}
-<form method="post" action="{{ url_for('login') }}" class="form-group">
+<form method="post" action="{{ url_for('login') }}" class="form-group col-sm-4">
     <label for="username">User name</label>
     <input type="text" name="username" id="username" class="form-control col-sm-4">
     <label for="password">Password</label>
