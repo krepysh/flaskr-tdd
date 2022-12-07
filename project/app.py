@@ -1,8 +1,7 @@
 import os
-import sqlite3
-from sqlite3 import Connection
+from pathlib import Path
 from typing import NamedTuple
-
+from flask_sqlalchemy import SQLAlchemy
 from flask import (
     Flask,
     g,
@@ -16,21 +15,27 @@ from flask import (
     jsonify,
 )
 
+
+basedir = Path(__file__).resolve().parent
+
 DATABASE = "flaskr.sqlite3"
 USER_NAME = "admin"
 PASSWORD = "admin"
 SECRET_KEY = os.environ.get("SECRET_KEY")
+SQLALCHEMY_DATABASE_URI = f"sqlite:///{Path(basedir).joinpath(DATABASE)}"
+SQLALCHEMY_TRACK_MODIFICATIONS = False
 
 app = Flask(__name__)
 
 app.config.from_object(__name__)
+db = SQLAlchemy(app)
+
+from project import models  # noqa: E402
 
 
 @app.route("/")
 def index():
-    db = get_db()
-    cur = db.execute("select * from entries order by id desc")
-    entries = cur.fetchall()
+    entries = db.session.query(models.Post)
     return render_template("index.html", entries=entries)
 
 
@@ -65,58 +70,32 @@ class Entry(NamedTuple):
     body: str
 
 
-def extract_entry(form: dict) -> Entry:
+def extract_entry(form: dict) -> models.Post:
     title = form["title"]
     body = form["body"]
-    return Entry(title=title, body=body)
+    return models.Post(title=title, body=body)
 
 
 @app.route("/add_entry", methods=["POST"])
 def add_entry():
     if not session.get("logged_in"):
         abort(401)
-    entry = extract_entry(request.form)
-    db = get_db()
-    query = "INSERT into entries (title, body) VALUES (?, ?);"
-    cur = db.execute(query, entry)
-    db.commit()
-    flash(f"Inserted {cur.rowcount} rows.")
+    post = extract_entry(request.form)
+    db.session.add(post)
+    db.session.commit()
+    flash(f"Inserted {1} rows.")
     return redirect(url_for("index"))
 
 
 @app.route("/delete/<message_id>", methods=["GET", "POST"])
 def delete_message(message_id):
     try:
-        db = get_db()
-        query = "DELETE from entries where id = ?"
-        db.execute(query, message_id)
-        db.commit()
+        db.session.query(models.Post).filter_by(id=message_id).delete()
+        db.session.commit()
         result = {"result": 1, "message": "Post deleted"}
     except Exception as e:
         result = {"result": 0, "message": str(e)}
     return jsonify(result)
-
-
-def connect_db() -> Connection:
-    connector = sqlite3.connect(app.config["DATABASE"])
-    connector.row_factory = sqlite3.Row
-    return connector
-
-
-def get_db() -> Connection:
-    if not hasattr(g, "sqlite_db"):
-        g.sqlite_db = connect_db()
-    return g.sqlite_db
-
-
-def init_db():
-    with app.app_context():
-        db = get_db()
-        with app.open_resource("schema.sql", "r") as f:
-            cursor = db.cursor()
-            cursor.executescript(f.read())
-        db.commit()
-    return
 
 
 @app.teardown_appcontext

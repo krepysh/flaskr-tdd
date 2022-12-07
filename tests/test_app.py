@@ -1,18 +1,22 @@
 import pytest
 from flask.testing import FlaskClient
 
-from project.app import app, init_db
+from project.app import app, db
 from pathlib import Path
+
+TEST_DB = "test_db.sqlite3"
 
 
 @pytest.fixture
 def client():
-    app.config["DATABASE"] = "test_db.sqlite3"
+    basedir = Path(__file__).resolve().parent.parent
+    app.config["DATABASE"] = Path(basedir).joinpath(TEST_DB)
     app.config["TESTING"] = True
+    app.config["SQLALCHEMY_DATABASE_URI"] = f'sqlite:///{app.config["DATABASE"]}'
 
-    init_db()
+    db.create_all()
     yield app.test_client()
-    init_db()
+    db.drop_all()
 
 
 def login(client: FlaskClient):
@@ -47,7 +51,7 @@ def test_login_logout(client):
 
 
 def test_db():
-    init_db()
+    db.create_all()
     assert Path("test_db.sqlite3").is_file()
 
 
